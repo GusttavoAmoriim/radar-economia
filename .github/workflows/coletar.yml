@@ -3,10 +3,15 @@ name: Coletar e publicar
 on:
   schedule:
     - cron: "17 */6 * * *"   # a cada 6 horas (horário UTC), fora do minuto cheio
+    - cron: "2 11 * * *"     # resumo diário: 11:02 UTC = 08:02 em Brasília
   workflow_dispatch:          # permite rodar manualmente pelo botão "Run workflow"
     inputs:
       testar_telegram:
         description: "Enviar uma mensagem de teste ao Telegram"
+        type: boolean
+        default: false
+      enviar_resumo:
+        description: "Enviar o resumo diário ao Telegram agora"
         type: boolean
         default: false
 
@@ -47,6 +52,13 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python coletor.py coletar
+
+      - name: Resumo diário no Telegram (8h, ou quando marcado)
+        if: ${{ github.event.schedule == '2 11 * * *' || inputs.enviar_resumo }}
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python coletor.py resumo
 
       - name: Guardar o banco no repositório
         run: |
