@@ -54,3 +54,15 @@ series:
     fonte: sidra
     caminho: /t/5932/n1/all/v/6564/p/last%2040/c11255/90707
     trimestral: true
+  - id: euro_venda
+    nome: Euro comercial - venda (R$)
+    fonte: bcb
+    codigo: 21619
+    ultimos: 500
+    anos: 3
+  - id: ibovespa
+    nome: Ibovespa - fechamento (pontos)
+    fonte: bcb
+    codigo: 7
+    ultimos: 500
+    anos: 3
