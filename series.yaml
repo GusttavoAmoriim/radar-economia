@@ -64,3 +64,12 @@ series:
     fonte: bcb
     codigo: 7
     anos: 3
+  - id: desemprego_ibge
+    nome: Taxa de desocupação - PNAD Contínua, trimestre móvel (%) (IBGE)
+    fonte: sidra
+    caminho: /t/4099/n1/all/v/4099/p/last%2040
+  - id: desemprego_bcb
+    nome: Taxa de desocupação - PNAD Contínua (%) (via BCB)
+    fonte: bcb
+    codigo: 24369
+    anos: 5

@@ -17,3 +17,5 @@ alertas:
   - serie: dolar_venda
     tipo: abaixo
     valor: 4.80
+  - serie: desemprego_ibge
+    tipo: novo
