@@ -6,6 +6,7 @@ Uso:
   python coletor.py agendar [horas]    # coleta em loop (padrão: a cada 6 h)
   python coletor.py painel [--sem-abrir]  # gera (e abre) dados/painel.html
   python coletor.py testar-telegram    # envia mensagem de teste
+  python coletor.py resumo             # envia o resumo diário ao Telegram
   python coletor.py telegram-chat-id   # descobre o chat id do seu bot
   python coletor.py sidra /t/..        # confere o que um caminho SIDRA devolve
 """
@@ -24,6 +25,10 @@ DB = BASE / "dados" / "economia.db"
 UA = "radar-economia/0.1 (uso pessoal)"
 BCB = "https://api.bcb.gov.br/dados/serie/bcdata.sgs.{codigo}/dados/ultimos/{n}?formato=json"
 BCB_INTERVALO = "https://api.bcb.gov.br/dados/serie/bcdata.sgs.{codigo}/dados?formato=json&dataInicial={ini}&dataFinal={fim}"
+OLINDA = ("https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/CotacaoMoedaPeriodo("
+          "moeda=@moeda,dataInicial=@dataInicial,dataFinalCotacao=@dataFinalCotacao)"
+          "?@moeda='{moeda}'&@dataInicial='{ini}'&@dataFinalCotacao='{fim}'&$top=10000&$format=json"
+          "&$select=cotacaoVenda,dataHoraCotacao,tipoBoletim")
 SIDRA = "https://apisidra.ibge.gov.br/values{caminho}"
 
 
@@ -47,10 +52,12 @@ def carregar_series(arquivo=BASE / "series.yaml"):
         for campo in ("id", "nome", "fonte"):
             if not s.get(campo):
                 raise ValueError(f"series.yaml: item {i} sem '{campo}'")
-        if s["fonte"] not in ("bcb", "sidra"):
+        if s["fonte"] not in ("bcb", "sidra", "ptax"):
             raise ValueError(f"series.yaml: '{s['id']}' com fonte inválida '{s['fonte']}'")
         if s["fonte"] == "bcb" and not s.get("codigo"):
             raise ValueError(f"series.yaml: '{s['id']}' precisa de 'codigo'")
+        if s["fonte"] == "ptax" and not s.get("moeda"):
+            raise ValueError(f"series.yaml: '{s['id']}' precisa de 'moeda' (ex.: EUR)")
         if s["fonte"] == "sidra" and not s.get("caminho"):
             raise ValueError(f"series.yaml: '{s['id']}' precisa de 'caminho'")
         if s["id"] in vistos:
@@ -90,21 +97,28 @@ def _num(txt):
 
 
 def buscar_bcb(s, desde=None):
-    """desde: data ISO da última observação guardada; se houver, busca só a partir de 60 dias antes dela."""
-    def parse(linhas):
-        # data vem como dd/mm/aaaa -> guardamos ISO aaaa-mm-dd
-        return [(datetime.strptime(l["data"], "%d/%m/%Y").date().isoformat(), _num(l["valor"])) for l in linhas]
-
+    """Sempre por intervalo de datas (o BCB limita 'ultimos/N' a 20 registros).
+    desde: data ISO da última observação guardada; se houver, busca só a partir de 60 dias antes dela."""
     fim = date.today()
     if desde:
         ini = date.fromisoformat(desde) - timedelta(days=60)  # margem para revisões
-        return parse(_get(BCB_INTERVALO.format(codigo=s["codigo"], ini=ini.strftime("%d/%m/%Y"), fim=fim.strftime("%d/%m/%Y"))))
-    try:
-        return parse(_get(BCB.format(codigo=s["codigo"], n=s.get("ultimos", 120))))
-    except RuntimeError:
-        # alternativa: intervalo de datas (a API aceita no máximo 10 anos em séries diárias)
+    else:
         ini = date(fim.year - int(s.get("anos", 9)), fim.month, 1)
-        return parse(_get(BCB_INTERVALO.format(codigo=s["codigo"], ini=ini.strftime("%d/%m/%Y"), fim=fim.strftime("%d/%m/%Y"))))
+    linhas = _get(BCB_INTERVALO.format(codigo=s["codigo"], ini=ini.strftime("%d/%m/%Y"), fim=fim.strftime("%d/%m/%Y")))
+    # data vem como dd/mm/aaaa -> guardamos ISO aaaa-mm-dd
+    return [(datetime.strptime(l["data"], "%d/%m/%Y").date().isoformat(), _num(l["valor"])) for l in linhas]
+
+
+def buscar_ptax(s, desde=None):
+    """Cotação de venda no boletim de fechamento da PTAX (API Olinda do BCB) para a moeda indicada."""
+    fim = date.today()
+    ini = (date.fromisoformat(desde) - timedelta(days=30)) if desde else date(fim.year - int(s.get("anos", 3)), fim.month, 1)
+    url = OLINDA.format(moeda=s["moeda"], ini=ini.strftime("%m-%d-%Y"), fim=fim.strftime("%m-%d-%Y"))
+    saida = {}
+    for l in _get(url).get("value", []):
+        if l.get("tipoBoletim") == "Fechamento":
+            saida[l["dataHoraCotacao"][:10]] = _num(l["cotacaoVenda"])
+    return sorted(saida.items())
 
 
 def buscar_sidra(s):
@@ -116,9 +130,9 @@ def buscar_sidra(s):
 def coletar_serie(con, s):
     agora = datetime.now().isoformat(timespec="seconds")
     try:
-        if s["fonte"] == "bcb":
+        if s["fonte"] in ("bcb", "ptax"):
             ult = con.execute("SELECT MAX(periodo) FROM observacoes WHERE serie=?", (s["id"],)).fetchone()[0]
-            obs = buscar_bcb(s, ult)
+            obs = (buscar_bcb if s["fonte"] == "bcb" else buscar_ptax)(s, ult)
         else:
             obs = buscar_sidra(s)
         antes = con.total_changes
@@ -194,6 +208,9 @@ if __name__ == "__main__":
     elif cmd == "testar-telegram":
         import alertas
         alertas.testar()
+    elif cmd == "resumo":
+        import alertas
+        alertas.enviar_resumo()
     elif cmd == "telegram-chat-id":
         import alertas
         alertas.descobrir_chat_id()

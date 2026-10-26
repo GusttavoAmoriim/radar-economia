@@ -1,5 +1,6 @@
 """Alertas por Telegram. Estado em SQLite: cada alerta avisa uma vez e não repete."""
 import os
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import requests
@@ -136,3 +137,44 @@ def testar():
     except RuntimeError as e:
         print("ERRO:", e)
         print("Dica: rode  python coletor.py telegram-chat-id  para descobrir o chat id certo.")
+
+
+DIAS = ["segunda", "terça", "quarta", "quinta", "sexta", "sábado", "domingo"]
+
+
+def _pt(v):
+    return "—" if v is None else f"{v:g}".replace(".", ",")
+
+
+def _periodo(p):
+    return f"{p[:4]}-{p[4:]}" if len(p) == 6 else p
+
+
+def montar_resumo(con=None, agora=None):
+    con = con or coletor.conectar()
+    agora = agora or datetime.now(timezone(timedelta(hours=-3)))
+    linhas = [f"📊 Radar Economia — {DIAS[agora.weekday()]}, {agora:%d/%m/%Y}", ""]
+    for s in coletor.carregar_series():
+        rows = con.execute("SELECT periodo,valor FROM observacoes WHERE serie=? ORDER BY periodo DESC LIMIT 2",
+                           (s["id"],)).fetchall()
+        if not rows:
+            continue
+        per, val = rows[0]
+        sinal, extra = "⚪", ""
+        if len(rows) > 1 and val is not None and rows[1][1] is not None:
+            d = val - rows[1][1]
+            sinal = "🟢" if d > 0 else "🔴" if d < 0 else "⚪"
+            extra = f" ({'▲' if d > 0 else '▼' if d < 0 else '='} {_pt(abs(round(d, 4)))})"
+        linhas.append(f"{sinal} {s['nome']}: {_pt(val)}{extra} · {_periodo(per)}")
+    return "\n".join(linhas)
+
+
+def enviar_resumo(cfg=None, enviar_fn=enviar):
+    cfg = cfg or ler_env()
+    texto = montar_resumo()
+    if not (cfg.get("TELEGRAM_BOT_TOKEN") and cfg.get("TELEGRAM_CHAT_ID")):
+        print(texto)
+        print("\n(Telegram não configurado: resumo só exibido na tela)")
+        return
+    enviar_fn(texto, cfg)
+    print("Resumo diário enviado.")

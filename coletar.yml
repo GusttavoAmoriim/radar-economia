@@ -1,0 +1,86 @@
+name: Coletar e publicar
+
+on:
+  schedule:
+    - cron: "17 */6 * * *"   # a cada 6 horas (horário UTC), fora do minuto cheio
+    - cron: "2 11 * * *"     # resumo diário: 11:02 UTC = 08:02 em Brasília
+  workflow_dispatch:          # permite rodar manualmente pelo botão "Run workflow"
+    inputs:
+      testar_telegram:
+        description: "Enviar uma mensagem de teste ao Telegram"
+        type: boolean
+        default: false
+      enviar_resumo:
+        description: "Enviar o resumo diário ao Telegram agora"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write   # para guardar o banco no repositório
+  pages: write      # para publicar o painel
+  id-token: write
+
+concurrency:
+  group: radar-economia
+  cancel-in-progress: false
+
+jobs:
+  coletar:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Teste do Telegram (só quando marcado)
+        if: ${{ inputs.testar_telegram }}
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python coletor.py testar-telegram
+
+      - name: Coletar séries e verificar alertas
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python coletor.py coletar
+
+      - name: Resumo diário no Telegram (8h, ou quando marcado)
+        if: ${{ github.event.schedule == '2 11 * * *' || inputs.enviar_resumo }}
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python coletor.py resumo
+
+      - name: Guardar o banco no repositório
+        run: |
+          git config user.name "radar-economia"
+          git config user.email "radar-economia@users.noreply.github.com"
+          git add dados/economia.db
+          if git diff --cached --quiet; then
+            echo "Sem mudanças no banco."
+          else
+            git commit -m "Atualiza dados $(date -u +%Y-%m-%dT%H:%MZ)"
+            git push
+          fi
+
+      - name: Gerar painel
+        run: |
+          python coletor.py painel --sem-abrir
+          mkdir site
+          cp dados/painel.html site/index.html
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - id: deploy
+        uses: actions/deploy-pages@v4
