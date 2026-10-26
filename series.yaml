@@ -7,7 +7,7 @@ series:
     fonte: bcb
     codigo: 432
     ultimos: 60
-	anos: 3
+    anos: 3
   - id: ipca_mensal
     nome: IPCA - variação mensal (%)
     fonte: bcb
