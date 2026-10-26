@@ -1,0 +1,115 @@
+
+=== SIDRA 2296 - SINAPI custo médio m² e variações
+nome: Custo médio m² em moeda corrente e variações percentuais no mês, no ano e em doze meses | periodicidade: mensal
+  v/48: Custo médio m² - moeda corrente [Reais]
+  v/2119: Custo médio m² - componente material - moeda corrente [Reais]
+  v/2120: Custo médio m² - componente mão-de-obra - moeda corrente [Reais]
+  v/49: Custo médio m² - número-índice [Número-índice]
+  v/1193: Custo médio m² - componente material - número-índice [Número-índice]
+  v/1232: Custo médio m² - componente mão-de-obra - número-índice [Número-índice]
+  v/1196: Custo médio m² - variação percentual no mês [%]
+  v/1197: Custo médio m² - variação percentual no ano [%]
+  v/1198: Custo médio m² - variação percentual em doze meses [%]
+
+=== SIDRA 8886 - PIM insumos da construção civil
+nome: Produção Física Industrial dos insumos típicos da construção civil | periodicidade: mensal
+  v/12606: PIMPF - Número-índice (2022=100) [Número-índice]
+  v/11602: PIMPF - Variação mês/mesmo mês do ano anterior (M/M-12) [%]
+  v/11603: PIMPF - Variação acumulada no ano (em relação ao mesmo período do ano anterior) [%]
+  v/11604: PIMPF - Variação acumulada em 12 meses (em relação ao período anterior de 12 meses) [%]
+
+=== SIDRA 8888 - PIM seção e atividade
+nome: Produção Física Industrial, por seções e atividades industriais | periodicidade: mensal
+  v/12606: PIMPF - Número-índice (2022=100) [Número-índice]
+  v/12607: PIMPF - Número-índice com ajuste sazonal (2022=100) [Número-índice]
+  v/11601: PIMPF - Variação mês/mês imediatamente anterior, com ajuste sazonal (M/M-1) [%]
+  v/11602: PIMPF - Variação mês/mesmo mês do ano anterior (M/M-12) [%]
+  v/11603: PIMPF - Variação acumulada no ano (em relação ao mesmo período do ano anterior) [%]
+  v/11604: PIMPF - Variação acumulada em 12 meses (em relação ao período anterior de 12 meses) [%]
+  classificação c544: Seções e atividades industriais (CNAE 2.0) (27 categorias)
+      129314: 1 Indústria geral
+      129315: 2 Indústrias extrativas
+      129316: 3 Indústrias de transformação
+      129317: 3.10 Fabricação de produtos alimentícios
+      129318: 3.11 Fabricação de bebidas
+      129319: 3.12 Fabricação de produtos do fumo
+      129320: 3.13 Fabricação de produtos têxteis
+      129321: 3.14 Confecção de artigos do vestuário e acessórios
+      129322: 3.15 Preparação de couros e fabricação de artefatos de couro, artigos para viagem e calçados
+      129323: 3.16 Fabricação de produtos de madeira
+      129324: 3.17 Fabricação de celulose, papel e produtos de papel
+      129325: 3.18 Impressão e reprodução de gravações
+
+=== SIDRA 8889 - PIM indicador especial
+nome: Produção Física Industrial, por indicadores especiais | periodicidade: mensal
+  v/12606: PIMPF - Número-índice (2022=100) [Número-índice]
+  v/11602: PIMPF - Variação mês/mesmo mês do ano anterior (M/M-12) [%]
+  v/11603: PIMPF - Variação acumulada no ano (em relação ao mesmo período do ano anterior) [%]
+  v/11604: PIMPF - Variação acumulada em 12 meses (em relação ao período anterior de 12 meses) [%]
+  classificação c25: Indicadores especiais (69 categorias)
+      150: 1.1 Bens de Capital para fins industriais
+      151: 1.1.1 Bens de Capital para fins industriais seriados
+      152: 1.1.2 Bens de Capital para fins industriais não seriados
+      153: 1.2 Bens de Capital agrícolas
+      209: 1.3 Bens de Capital peças agrícolas
+      210: 1.4 Bens de Capital para construção
+      211: 1.5 Bens de Capital para o setor de energia elétrica
+      212: 1.6 Bens de Capital para equipamentos de transporte
+      213: 1.7 Bens de Capital de uso misto
+      214: 2 Insumos Típicos da Construção Civil
+      215: 3 Total de Embalagens
+      216: 3.1 Embalagens de vidro
+
+=== SIDRA 8757 - PMC material de construção
+nome: Índice e variação da receita nominal e do volume de vendas de materiais de construção (2022 = 100) | periodicidade: mensal
+  v/7169: PMC - Número-índice (2022=100) [Número-índice]
+  v/7170: PMC - Número-índice com ajuste sazonal (2022=100) [Número-índice]
+  v/11708: PMC - Variação mês/mês imediatamente anterior, com ajuste sazonal (M/M-1) [%]
+  v/11709: PMC - Variação mês/mesmo mês do ano anterior (M/M-12) [%]
+  v/11710: PMC - Variação acumulada no ano (em relação ao mesmo período do ano anterior) [%]
+  v/11711: PMC - Variação acumulada em 12 meses (em relação ao período anterior de 12 meses) [%]
+  classificação c11046: Tipos de índice (2 categorias)
+      56731: Índice de receita nominal de vendas de materiais de construção
+      56732: Índice de volume de vendas de materiais de construção
+
+=== SIDRA 8880 - PMC varejo
+nome: Índice e variação da receita nominal e do volume de vendas no comércio varejista (2022 = 100) | periodicidade: mensal
+  v/7169: PMC - Número-índice (2022=100) [Número-índice]
+  v/7170: PMC - Número-índice com ajuste sazonal (2022=100) [Número-índice]
+  v/11708: PMC - Variação mês/mês imediatamente anterior, com ajuste sazonal (M/M-1) [%]
+  v/11709: PMC - Variação mês/mesmo mês do ano anterior (M/M-12) [%]
+  v/11710: PMC - Variação acumulada no ano (em relação ao mesmo período do ano anterior) [%]
+  v/11711: PMC - Variação acumulada em 12 meses (em relação ao período anterior de 12 meses) [%]
+  classificação c11046: Tipos de índice (2 categorias)
+      56733: Índice de receita nominal de vendas no comércio varejista
+      56734: Índice de volume de vendas no comércio varejista
+
+=== SIDRA 8881 - PMC varejo ampliado
+nome: Índice e variação da receita nominal e do volume de vendas no comércio varejista ampliado (2022 = 100) | periodicidade: mensal
+  v/7169: PMC - Número-índice (2022=100) [Número-índice]
+  v/7170: PMC - Número-índice com ajuste sazonal (2022=100) [Número-índice]
+  v/11708: PMC - Variação mês/mês imediatamente anterior, com ajuste sazonal (M/M-1) [%]
+  v/11709: PMC - Variação mês/mesmo mês do ano anterior (M/M-12) [%]
+  v/11710: PMC - Variação acumulada no ano (em relação ao mesmo período do ano anterior) [%]
+  v/11711: PMC - Variação acumulada em 12 meses (em relação ao período anterior de 12 meses) [%]
+  classificação c11046: Tipos de índice (2 categorias)
+      56735: Índice de receita nominal de vendas no comércio varejista ampliado
+      56736: Índice de volume de vendas no comércio varejista ampliado
+
+=== FOCUS (Olinda Expectativas)
+ExpectativasMercadoAnuais / IPCA: 3 linhas de amostra
+   {'Indicador': 'IPCA', 'IndicadorDetalhe': None, 'Data': '2026-10-23', 'DataReferencia': '2026', 'Media': 5.1756, 'Mediana': 5.1891, 'DesvioPadrao': 0.1461, 'Minimo': 4.8, 'Maximo': 5.7485, 'numeroRespondentes': 142, 'baseCalculo': 0}
+   {'Indicador': 'IPCA', 'IndicadorDetalhe': None, 'Data': '2026-10-23', 'DataReferencia': '2027', 'Media': 4.3777, 'Mediana': 4.3368, 'DesvioPadrao': 0.4337, 'Minimo': 3.2473, 'Maximo': 6.0, 'numeroRespondentes': 142, 'baseCalculo': 0}
+   {'Indicador': 'IPCA', 'IndicadorDetalhe': None, 'Data': '2026-10-23', 'DataReferencia': '2028', 'Media': 3.754, 'Mediana': 3.75, 'DesvioPadrao': 0.4756, 'Minimo': 2.8, 'Maximo': 6.0, 'numeroRespondentes': 124, 'baseCalculo': 0}
+ExpectativasMercadoAnuais / PIB Total: 3 linhas de amostra
+   {'Indicador': 'PIB Total', 'IndicadorDetalhe': None, 'Data': '2026-10-23', 'DataReferencia': '2026', 'Media': 1.7871, 'Mediana': 1.8, 'DesvioPadrao': 0.1463, 'Minimo': 1.2515, 'Maximo': 2.2825, 'numeroRespondentes': 113, 'baseCalculo': 0}
+   {'Indicador': 'PIB Total', 'IndicadorDetalhe': None, 'Data': '2026-10-23', 'DataReferencia': '2027', 'Media': 1.3075, 'Mediana': 1.3145, 'DesvioPadrao': 0.3406, 'Minimo': 0.2933, 'Maximo': 2.3755, 'numeroRespondentes': 113, 'baseCalculo': 0}
+   {'Indicador': 'PIB Total', 'IndicadorDetalhe': None, 'Data': '2026-10-23', 'DataReferencia': '2028', 'Media': 1.8888, 'Mediana': 1.81, 'DesvioPadrao': 0.3487, 'Minimo': 1.0, 'Maximo': 3.0, 'numeroRespondentes': 83, 'baseCalculo': 0}
+ExpectativasMercadoAnuais / Câmbio: 3 linhas de amostra
+   {'Indicador': 'Câmbio', 'IndicadorDetalhe': None, 'Data': '2026-10-23', 'DataReferencia': '2026', 'Media': 5.0502, 'Mediana': 5.0495, 'DesvioPadrao': 0.1609, 'Minimo': 4.5, 'Maximo': 5.4, 'numeroRespondentes': 112, 'baseCalculo': 0}
+   {'Indicador': 'Câmbio', 'IndicadorDetalhe': None, 'Data': '2026-10-23', 'DataReferencia': '2027', 'Media': 5.1353, 'Mediana': 5.15, 'DesvioPadrao': 0.2392, 'Minimo': 4.5, 'Maximo': 5.85, 'numeroRespondentes': 111, 'baseCalculo': 0}
+   {'Indicador': 'Câmbio', 'IndicadorDetalhe': None, 'Data': '2026-10-23', 'DataReferencia': '2028', 'Media': 5.1898, 'Mediana': 5.2, 'DesvioPadrao': 0.2738, 'Minimo': 4.5, 'Maximo': 6.0, 'numeroRespondentes': 87, 'baseCalculo': 0}
+ExpectativasMercadoAnuais / Selic: 3 linhas de amostra
+   {'Indicador': 'Selic', 'IndicadorDetalhe': None, 'Data': '2026-10-23', 'DataReferencia': '2026', 'Media': 13.3139, 'Mediana': 13.25, 'DesvioPadrao': 0.1838, 'Minimo': 13.0, 'Maximo': 14.0, 'numeroRespondentes': 137, 'baseCalculo': 0}
+   {'Indicador': 'Selic', 'IndicadorDetalhe': None, 'Data': '2026-10-23', 'DataReferencia': '2027', 'Media': 11.6029, 'Mediana': 11.75, 'DesvioPadrao': 0.775, 'Minimo': 9.0, 'Maximo': 14.0, 'numeroRespondentes': 136, 'baseCalculo': 0}
+   {'Indicador': 'Selic', 'IndicadorDetalhe': None, 'Data': '2026-10-23', 'DataReferencia': '2028', 'Media': 10.2327, 'Mediana': 10.0, 'DesvioPadrao': 0.8772, 'Minimo': 8.0, 'Maximo': 13.5, 'numeroRespondentes': 115, 'baseCalculo': 0}

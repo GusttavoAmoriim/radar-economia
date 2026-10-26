@@ -73,3 +73,67 @@ series:
     fonte: bcb
     codigo: 24369
     anos: 5
+  - id: sinapi_custo_m2
+    nome: SINAPI - custo médio do m² (R$)
+    fonte: sidra
+    caminho: /t/2296/n1/all/v/48/p/last%2060
+  - id: sinapi_mes
+    nome: SINAPI - variação no mês (%)
+    fonte: sidra
+    caminho: /t/2296/n1/all/v/1196/p/last%2060
+  - id: sinapi_12m
+    nome: SINAPI - variação em 12 meses (%)
+    fonte: sidra
+    caminho: /t/2296/n1/all/v/1198/p/last%2060
+  - id: pim_industria_mm
+    nome: Produção industrial geral - variação mensal, ajustada (%)
+    fonte: sidra
+    caminho: /t/8888/n1/all/v/11601/p/last%2060/c544/129314
+  - id: pim_construcao_ano
+    nome: Produção de insumos da construção civil - contra o mesmo mês do ano anterior (%)
+    fonte: sidra
+    caminho: /t/8886/n1/all/v/11602/p/last%2060
+  - id: pmc_varejo_mm
+    nome: Vendas no varejo (volume) - variação mensal, ajustada (%)
+    fonte: sidra
+    caminho: /t/8880/n1/all/v/11708/p/last%2060/c11046/56734
+  - id: pmc_material_construcao_mm
+    nome: Vendas de material de construção (volume) - variação mensal, ajustada (%)
+    fonte: sidra
+    caminho: /t/8757/n1/all/v/11708/p/last%2060/c11046/56732
+  - id: focus_ipca_2026
+    nome: Focus - IPCA 2026, mediana (%)
+    fonte: focus
+    indicador: IPCA
+    referencia: "2026"
+    anos: 1
+  - id: focus_ipca_2027
+    nome: Focus - IPCA 2027, mediana (%)
+    fonte: focus
+    indicador: IPCA
+    referencia: "2027"
+    anos: 1
+  - id: focus_selic_2026
+    nome: Focus - Selic no fim de 2026, mediana (% a.a.)
+    fonte: focus
+    indicador: Selic
+    referencia: "2026"
+    anos: 1
+  - id: focus_selic_2027
+    nome: Focus - Selic no fim de 2027, mediana (% a.a.)
+    fonte: focus
+    indicador: Selic
+    referencia: "2027"
+    anos: 1
+  - id: focus_pib_2026
+    nome: Focus - PIB 2026, mediana (%)
+    fonte: focus
+    indicador: PIB Total
+    referencia: "2026"
+    anos: 1
+  - id: focus_cambio_2026
+    nome: Focus - Câmbio no fim de 2026, mediana (R$/US$)
+    fonte: focus
+    indicador: Câmbio
+    referencia: "2026"
+    anos: 1

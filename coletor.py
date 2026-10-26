@@ -12,6 +12,7 @@ Uso:
 """
 import re
 import sqlite3
+from urllib.parse import quote
 import sys
 import time
 from datetime import datetime, date, timedelta
@@ -29,6 +30,7 @@ OLINDA = ("https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/Cotacao
           "moeda=@moeda,dataInicial=@dataInicial,dataFinalCotacao=@dataFinalCotacao)"
           "?@moeda='{moeda}'&@dataInicial='{ini}'&@dataFinalCotacao='{fim}'&$top=10000&$format=json"
           "&$select=cotacaoVenda,dataHoraCotacao,tipoBoletim")
+FOCUS_ANUAL = "https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/ExpectativasMercadoAnuais?"
 SIDRA = "https://apisidra.ibge.gov.br/values{caminho}"
 
 
@@ -52,10 +54,12 @@ def carregar_series(arquivo=BASE / "series.yaml"):
         for campo in ("id", "nome", "fonte"):
             if not s.get(campo):
                 raise ValueError(f"series.yaml: item {i} sem '{campo}'")
-        if s["fonte"] not in ("bcb", "sidra", "ptax"):
+        if s["fonte"] not in ("bcb", "sidra", "ptax", "focus"):
             raise ValueError(f"series.yaml: '{s['id']}' com fonte inválida '{s['fonte']}'")
         if s["fonte"] == "bcb" and not s.get("codigo"):
             raise ValueError(f"series.yaml: '{s['id']}' precisa de 'codigo'")
+        if s["fonte"] == "focus" and not (s.get("indicador") and s.get("referencia")):
+            raise ValueError(f"series.yaml: '{s['id']}' precisa de 'indicador' e 'referencia'")
         if s["fonte"] == "ptax" and not s.get("moeda"):
             raise ValueError(f"series.yaml: '{s['id']}' precisa de 'moeda' (ex.: EUR)")
         if s["fonte"] == "sidra" and not s.get("caminho"):
@@ -121,6 +125,16 @@ def buscar_ptax(s, desde=None):
     return sorted(saida.items())
 
 
+def buscar_focus(s, desde=None):
+    """Mediana das expectativas do Focus (anuais) para um indicador e um ano de referência, ao longo do tempo."""
+    fim = date.today()
+    ini = (date.fromisoformat(desde) - timedelta(days=30)) if desde else date(fim.year - int(s.get("anos", 1)), fim.month, 1)
+    filtro = (f"Indicador eq '{s['indicador']}' and DataReferencia eq '{s['referencia']}' "
+              f"and baseCalculo eq 0 and Data ge '{ini.isoformat()}'")
+    url = (FOCUS_ANUAL + "$filter=" + quote(filtro, safe="'=") + "&$orderby=Data&$top=10000&$format=json&$select=Data,Mediana")
+    return sorted({l["Data"][:10]: _num(l["Mediana"]) for l in _get(url).get("value", [])}.items())
+
+
 def buscar_sidra(s):
     linhas = _get(SIDRA.format(caminho=s["caminho"]))
     # primeira linha é o cabeçalho; D3C = período (AAAAMM mensal, AAAAQQ trimestral), V = valor
@@ -130,9 +144,9 @@ def buscar_sidra(s):
 def coletar_serie(con, s):
     agora = datetime.now().isoformat(timespec="seconds")
     try:
-        if s["fonte"] in ("bcb", "ptax"):
+        if s["fonte"] in ("bcb", "ptax", "focus"):
             ult = con.execute("SELECT MAX(periodo) FROM observacoes WHERE serie=?", (s["id"],)).fetchone()[0]
-            obs = (buscar_bcb if s["fonte"] == "bcb" else buscar_ptax)(s, ult)
+            obs = {"bcb": buscar_bcb, "ptax": buscar_ptax, "focus": buscar_focus}[s["fonte"]](s, ult)
         else:
             obs = buscar_sidra(s)
         antes = con.total_changes
@@ -172,6 +186,47 @@ def ultimos(serie=None, n=5):
             print(f"  {p}  {v}")
 
 
+AGREGADOS = "https://servicodados.ibge.gov.br/api/v3/agregados/{t}/metadados"
+FOCUS = ("https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/{rec}"
+         "?$top=3&$format=json&$filter=Indicador%20eq%20'{ind}'&$orderby=Data%20desc")
+TABELAS_SONDA = {2296: "SINAPI custo médio m² e variações", 8886: "PIM insumos da construção civil",
+                 8888: "PIM seção e atividade", 8889: "PIM indicador especial",
+                 8757: "PMC material de construção", 8880: "PMC varejo", 8881: "PMC varejo ampliado"}
+
+
+def sondar():
+    """Grava dados/sondagem.txt com variáveis/classificações das tabelas SIDRA e amostras do Focus."""
+    out = []
+    for t, nome in TABELAS_SONDA.items():
+        out.append(f"\n=== SIDRA {t} - {nome}")
+        try:
+            m = _get(AGREGADOS.format(t=t))
+            out.append(f"nome: {m.get('nome')} | periodicidade: {m.get('periodicidade', {}).get('frequencia')}")
+            for v in m.get("variaveis", []):
+                out.append(f"  v/{v['id']}: {v['nome']} [{v.get('unidade')}]")
+            for cl in m.get("classificacoes", []):
+                cats = cl.get("categorias", [])
+                out.append(f"  classificação c{cl['id']}: {cl['nome']} ({len(cats)} categorias)")
+                for ct in cats[:12]:
+                    out.append(f"      {ct['id']}: {ct['nome']}")
+        except Exception as e:
+            out.append(f"  ERRO: {str(e)[:200]}")
+    out.append("\n=== FOCUS (Olinda Expectativas)")
+    for rec, ind in (("ExpectativasMercadoAnuais", "IPCA"), ("ExpectativasMercadoAnuais", "PIB Total"),
+                     ("ExpectativasMercadoAnuais", "Câmbio"), ("ExpectativasMercadoAnuais", "Selic")):
+        try:
+            v = _get(FOCUS.format(rec=rec, ind=ind.replace(" ", "%20"))).get("value", [])
+            out.append(f"{rec} / {ind}: {len(v)} linhas de amostra")
+            for l in v:
+                out.append("   " + str(l)[:300])
+        except Exception as e:
+            out.append(f"{rec} / {ind}: ERRO {str(e)[:200]}")
+    texto = "\n".join(out)
+    DB.parent.mkdir(exist_ok=True)
+    (DB.parent / "sondagem.txt").write_text(texto, encoding="utf-8")
+    print(texto[:1500], "\n...\nRelatório completo em", DB.parent / "sondagem.txt")
+
+
 def ciclo():
     coletar()
     try:
@@ -208,6 +263,8 @@ if __name__ == "__main__":
     elif cmd == "testar-telegram":
         import alertas
         alertas.testar()
+    elif cmd == "sondar":
+        sondar()
     elif cmd == "resumo":
         import alertas
         alertas.enviar_resumo()

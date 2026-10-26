@@ -146,8 +146,10 @@ def _pt(v):
     return "—" if v is None else f"{v:g}".replace(".", ",")
 
 
-def _periodo(p):
-    return f"{p[:4]}-{p[4:]}" if len(p) == 6 else p
+def _periodo(p, trimestral=False):
+    if len(p) == 6:
+        return f"{p[:4]}-T{int(p[4:])}" if trimestral else f"{p[:4]}-{p[4:]}"
+    return p
 
 
 def montar_resumo(con=None, agora=None):
@@ -165,7 +167,7 @@ def montar_resumo(con=None, agora=None):
             d = val - rows[1][1]
             sinal = "🟢" if d > 0 else "🔴" if d < 0 else "⚪"
             extra = f" ({'▲' if d > 0 else '▼' if d < 0 else '='} {_pt(abs(round(d, 4)))})"
-        linhas.append(f"{sinal} {s['nome']}: {_pt(val)}{extra} · {_periodo(per)}")
+        linhas.append(f"{sinal} {s['nome']}: {_pt(val)}{extra} · {_periodo(per, bool(s.get('trimestral')))}")
     return "\n".join(linhas)
 
 
@@ -176,5 +178,13 @@ def enviar_resumo(cfg=None, enviar_fn=enviar):
         print(texto)
         print("\n(Telegram não configurado: resumo só exibido na tela)")
         return
-    enviar_fn(texto, cfg)
+    partes, atual = [], ""
+    for linha in texto.split("\n"):
+        if len(atual) + len(linha) + 1 > 3800:
+            partes.append(atual)
+            atual = ""
+        atual += linha + "\n"
+    partes.append(atual)
+    for p in partes:
+        enviar_fn(p.rstrip("\n"), cfg)
     print("Resumo diário enviado.")
