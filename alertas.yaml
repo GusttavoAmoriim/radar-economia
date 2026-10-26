@@ -1,0 +1,19 @@
+# Tipos:
+#   novo   -> avisa quando sai uma observação nova (ex.: o IPCA do mês foi divulgado)
+#   mudou  -> avisa quando o valor muda em relação ao último aviso (ex.: Selic)
+#   acima / abaixo -> avisa quando o valor cruza o limite (uma vez por cruzamento)
+alertas:
+  - serie: selic_meta
+    tipo: mudou
+  - serie: ipca_mensal
+    tipo: novo
+  - serie: incc_m
+    tipo: novo
+  - serie: pib_trim_anterior
+    tipo: novo
+  - serie: dolar_venda
+    tipo: acima
+    valor: 5.50
+  - serie: dolar_venda
+    tipo: abaixo
+    valor: 4.80

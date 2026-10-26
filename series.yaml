@@ -1,0 +1,55 @@
+# Séries monitoradas. Para desligar uma sem apagar: enabled: false
+# fonte "bcb": código SGS (https://www3.bcb.gov.br/sgspub/)
+# fonte "sidra": caminho da tabela SIDRA (https://sidra.ibge.gov.br/)
+series:
+  - id: selic_meta
+    nome: Meta da taxa Selic (% a.a.)
+    fonte: bcb
+    codigo: 432
+    ultimos: 60
+  - id: ipca_mensal
+    nome: IPCA - variação mensal (%)
+    fonte: bcb
+    codigo: 433
+    ultimos: 120
+  - id: ipca_mensal_ibge
+    nome: IPCA - variação mensal (%) (fonte IBGE)
+    fonte: sidra
+    caminho: /t/1737/n1/all/v/63/p/last%20120
+  - id: ipca_12m
+    nome: IPCA - acumulado em 12 meses (%)
+    fonte: bcb
+    codigo: 13522
+    ultimos: 120
+  - id: dolar_venda
+    nome: Dólar comercial - venda (R$)
+    fonte: bcb
+    codigo: 1
+    ultimos: 500
+    anos: 3
+  - id: dolar_ptax_mensal
+    nome: Dólar PTAX - venda, média mensal (R$)
+    fonte: bcb
+    codigo: 3698
+    ultimos: 500
+    anos: 3
+  - id: igpm_mensal
+    nome: IGP-M - variação mensal (%)
+    fonte: bcb
+    codigo: 189
+    ultimos: 120
+  - id: incc_m
+    nome: INCC-M - variação mensal (%) (construção civil)
+    fonte: bcb
+    codigo: 192
+    ultimos: 120
+  - id: pib_anual_trim
+    nome: PIB - variação contra o mesmo trimestre do ano anterior (%)
+    fonte: sidra
+    caminho: /t/5932/n1/all/v/6561/p/last%2040/c11255/90707
+    trimestral: true
+  - id: pib_trim_anterior
+    nome: PIB - variação contra o trimestre anterior, dessazonalizado (%)
+    fonte: sidra
+    caminho: /t/5932/n1/all/v/6564/p/last%2040/c11255/90707
+    trimestral: true
