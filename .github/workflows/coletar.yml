@@ -4,6 +4,11 @@ on:
   schedule:
     - cron: "17 */6 * * *"   # a cada 6 horas (horário UTC), fora do minuto cheio
   workflow_dispatch:          # permite rodar manualmente pelo botão "Run workflow"
+    inputs:
+      testar_telegram:
+        description: "Enviar uma mensagem de teste ao Telegram"
+        type: boolean
+        default: false
 
 permissions:
   contents: write   # para guardar o banco no repositório
@@ -29,6 +34,13 @@ jobs:
           cache: pip
 
       - run: pip install -r requirements.txt
+
+      - name: Teste do Telegram (só quando marcado)
+        if: ${{ inputs.testar_telegram }}
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python coletor.py testar-telegram
 
       - name: Coletar séries e verificar alertas
         env:
